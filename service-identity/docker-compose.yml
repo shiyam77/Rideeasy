@@ -1,0 +1,15 @@
+services:
+  service-identity:
+    image: rideeasy/service-identity:latest # Make sure you've built your image
+    build:
+      context: ./service-identity
+    ports:
+      - "8081-8083:8081" # Map a range of host ports to the container port
+    deploy:
+      replicas: 3 # This starts 3 instances automatically
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://infra-discovery-server:8761/eureka/
+    depends_on:
+      - infra-discovery-server
+      - postgres-db

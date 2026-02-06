@@ -1,0 +1,17 @@
+resilience4j:
+  circuitbreaker:
+    instances:
+      kafkaService:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15s
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092 # Adjust this if Kafka is inside Docker
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 3
+      properties:
+        enable.idempotence: true # Ensures messages aren't sent twice if the network glitches

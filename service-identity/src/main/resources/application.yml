@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        multiTenancy: SCHEMA
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+  resilience4j:
+    circuitbreaker:
+      instances:
+        dbService:
+          registerHealthIndicator: true
+          slidingWindowSize: 10          # Check the last 10 attempts
+          failureRateThreshold: 50       # Break if 50% of them fail
+          waitDurationInOpenState: 10s   # Wait 10 seconds before trying again
+          permittedNumberOfCallsInHalfOpenState: 3
