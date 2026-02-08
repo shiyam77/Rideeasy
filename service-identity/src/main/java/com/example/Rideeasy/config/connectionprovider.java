@@ -1,5 +1,6 @@
 package com.example.Rideeasy.config;
-import org.hibernate.orm.AvailableSettings;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
@@ -29,18 +30,21 @@ public class connectionprovider implements MultiTenantConnectionProvider, Hibern
     }
 
     @Override
-    public Connection getConnection(String tenantIdentifier) throws SQLException {
+    public Connection getConnection(Object tenantIdentifier) throws SQLException { // Changed String to Object
         Connection connection = getAnyConnection();
-        // Warning: Ensure tenantIdentifier is sanitized to prevent SQL injection
-        connection.createStatement().execute("SET SCHEMA '" + tenantIdentifier + "'");
+        // Cast to String safely
+        String tenant = tenantIdentifier.toString();
+        connection.createStatement().execute("SET SCHEMA '" + tenant + "'");
         return connection;
     }
 
     @Override
-    public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-        // Reset to default schema before returning to the pool
-        connection.createStatement().execute("SET SCHEMA 'public'");
-        connection.close();
+    public void releaseConnection(Object tenantIdentifier, Connection connection) throws SQLException { // Changed String to Object
+        try {
+            connection.createStatement().execute("SET SCHEMA 'public'");
+        } finally {
+            connection.close();
+        }
     }
 
     @Override
@@ -50,11 +54,14 @@ public class connectionprovider implements MultiTenantConnectionProvider, Hibern
 
     @Override
     public boolean isUnwrappableAs(Class<?> unwrapType) {
-        return false;
+        return MultiTenantConnectionProvider.class.isAssignableFrom(unwrapType);
     }
 
     @Override
     public <T> T unwrap(Class<T> unwrapType) {
+        if (isUnwrappableAs(unwrapType)) {
+            return unwrapType.cast(this);
+        }
         return null;
     }
 
