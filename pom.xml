@@ -18,7 +18,10 @@
     <module>infra-api-gateway</module>
     <module>service-trip</module>
     <module>service-notification</module>
-    <module>ride-ai-agent-service</module>
+    <module>infra-config-server</module>
+    <module>infra-admin-server</module>
+    <module>infra-zipkin-server</module>
+    <module>rideeasy-common</module>
 </modules>
 
     <properties>

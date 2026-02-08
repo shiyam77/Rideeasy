@@ -1,8 +1,17 @@
 spring:
   jpa:
+    # 1. Explicitly tell Hibernate to use PostgreSQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # 2. Usually 'none' or 'update' for multi-tenancy
+      ddl-auto: none
     properties:
       hibernate:
         multiTenancy: SCHEMA
+        temp:
+          use_jdbc_metadata_defaults: false
+          # 4. Ensure the dialect is set here as well
+          dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
